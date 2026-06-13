@@ -1,0 +1,267 @@
+<style>
+  #poly-wrap { padding: 1rem 0; }
+  #poly-graph { display: block; }
+  #poly-graph .node-g { cursor: pointer; transition: opacity .2s; }
+  #poly-graph .edge-line { transition: opacity .2s, stroke-width .2s, stroke .2s; pointer-events: none; fill: none; }
+  #poly-graph .edge-hit { fill: none; cursor: pointer; pointer-events: stroke; }
+  #poly-graph .edge-label-g { cursor: pointer; transition: opacity .2s; }
+  #poly-graph .dimmed { opacity: .18; }
+
+  #poly-panel {
+    margin-top: 14px;
+    padding: 16px 18px;
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+  }
+  #poly-panel h3 { margin: 0 0 8px; font-size: 16px; font-weight: 500; color: var(--color-text-primary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  #poly-panel .lede { margin: 0 0 12px; font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+  #poly-panel .hint { font-size: 12px; color: var(--color-text-tertiary); margin: 6px 0 0; }
+  #poly-panel .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+  #poly-panel .meta-item { padding: 10px 12px; background: var(--color-background-primary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); }
+  #poly-panel .meta-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  #poly-panel .meta-value { font-size: 12px; color: var(--color-text-primary); font-family: var(--font-mono); }
+  #poly-panel .risk-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; background: rgba(190, 50, 50, 0.08); border-left: 2px solid var(--color-text-danger); border-radius: 4px; font-size: 12px; color: var(--color-text-secondary); line-height: 1.55; }
+  #poly-panel .risk-label { color: var(--color-text-danger); font-weight: 500; flex-shrink: 0; }
+  #poly-panel .conn-list { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 4px; }
+  #poly-panel .conn-list li { display: flex; align-items: center; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: background .15s; font-size: 13px; }
+  #poly-panel .conn-list li:hover { background: var(--color-background-tertiary); }
+  #poly-panel .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+  #poly-panel .src-dst { color: var(--color-text-secondary); }
+  #poly-panel .arrow-sep { margin: 0 6px; color: var(--color-text-tertiary); }
+  #poly-panel .bridge { color: var(--color-text-primary); margin-left: auto; font-weight: 500; }
+  .lang-rust { color: #993C1D; }
+  .lang-python { color: #854F0B; }
+  .lang-go { color: #0F6E56; }
+  .lang-web { color: #534AB7; }
+  @media (prefers-color-scheme: dark) {
+    .lang-rust { color: #F0997B; }
+    .lang-python { color: #EF9F27; }
+    .lang-go { color: #5DCAA5; }
+    .lang-web { color: #AFA9EC; }
+  }
+</style>
+
+<div id="poly-wrap">
+  <svg id="poly-graph" width="100%" viewBox="0 0 680 470" role="img" onclick="polyReset()">
+    <title>Polyglot language interop map</title>
+    <desc>Four languages — Rust, Python, Go, and Web — connected by six interop bridges. Tap a language or edge to explore.</desc>
+
+    <g id="edges-layer">
+      <line class="edge-line" data-edge="rust-python" x1="340" y1="220" x2="115" y2="90" stroke="var(--color-border-secondary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <line class="edge-line" data-edge="rust-go" x1="340" y1="220" x2="565" y2="90" stroke="var(--color-border-secondary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <line class="edge-line" data-edge="rust-web" x1="340" y1="220" x2="340" y2="380" stroke="var(--color-border-secondary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <line class="edge-line" data-edge="python-go" x1="115" y1="90" x2="565" y2="90" stroke="var(--color-border-secondary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <line class="edge-line" data-edge="python-web" x1="115" y1="90" x2="340" y2="380" stroke="var(--color-border-secondary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <line class="edge-line" data-edge="go-web" x1="565" y1="90" x2="340" y2="380" stroke="var(--color-border-secondary)" stroke-width="1.5" stroke-dasharray="5 5"/>
+
+      <line class="edge-hit" data-edge-hit="rust-python" x1="340" y1="220" x2="115" y2="90" stroke="transparent" stroke-width="22"/>
+      <line class="edge-hit" data-edge-hit="rust-go" x1="340" y1="220" x2="565" y2="90" stroke="transparent" stroke-width="22"/>
+      <line class="edge-hit" data-edge-hit="rust-web" x1="340" y1="220" x2="340" y2="380" stroke="transparent" stroke-width="22"/>
+      <line class="edge-hit" data-edge-hit="python-go" x1="115" y1="90" x2="565" y2="90" stroke="transparent" stroke-width="22"/>
+      <line class="edge-hit" data-edge-hit="python-web" x1="115" y1="90" x2="340" y2="380" stroke="transparent" stroke-width="22"/>
+      <line class="edge-hit" data-edge-hit="go-web" x1="565" y1="90" x2="340" y2="380" stroke="transparent" stroke-width="22"/>
+
+      <g class="edge-label-g" data-edge-label="rust-python">
+        <rect x="202.5" y="145" width="50" height="20" rx="10" fill="var(--color-background-primary)" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>
+        <text class="ts" x="227.5" y="155" text-anchor="middle" dominant-baseline="central">PyO3</text>
+      </g>
+      <g class="edge-label-g" data-edge-label="rust-go">
+        <rect x="427.5" y="145" width="50" height="20" rx="10" fill="var(--color-background-primary)" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>
+        <text class="ts" x="452.5" y="155" text-anchor="middle" dominant-baseline="central">CGo</text>
+      </g>
+      <g class="edge-label-g" data-edge-label="rust-web">
+        <rect x="292" y="290" width="96" height="20" rx="10" fill="var(--color-background-primary)" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>
+        <text class="ts" x="340" y="300" text-anchor="middle" dominant-baseline="central">wasm-bindgen</text>
+      </g>
+      <g class="edge-label-g" data-edge-label="python-go">
+        <rect x="315" y="80" width="50" height="20" rx="10" fill="var(--color-background-primary)" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>
+        <text class="ts" x="340" y="90" text-anchor="middle" dominant-baseline="central">gRPC</text>
+      </g>
+      <g class="edge-label-g" data-edge-label="python-web">
+        <rect x="197.5" y="225" width="60" height="20" rx="10" fill="var(--color-background-primary)" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>
+        <text class="ts" x="227.5" y="235" text-anchor="middle" dominant-baseline="central">Pyodide</text>
+      </g>
+      <g class="edge-label-g" data-edge-label="go-web">
+        <rect x="418.5" y="225" width="68" height="20" rx="10" fill="var(--color-background-primary)" stroke="var(--color-border-tertiary)" stroke-width="0.5"/>
+        <text class="ts" x="452.5" y="235" text-anchor="middle" dominant-baseline="central">gRPC-Web</text>
+      </g>
+    </g>
+
+    <g id="nodes-layer">
+      <g class="node-g c-coral" data-node="rust">
+        <circle cx="340" cy="220" r="42" stroke-width="1.5"/>
+        <text class="th" x="340" y="216" text-anchor="middle" dominant-baseline="central">Rust</text>
+        <text class="ts" x="340" y="234" text-anchor="middle" dominant-baseline="central">Core</text>
+      </g>
+      <g class="node-g c-amber" data-node="python">
+        <circle cx="115" cy="90" r="42" stroke-width="1.5"/>
+        <text class="th" x="115" y="86" text-anchor="middle" dominant-baseline="central">Python</text>
+        <text class="ts" x="115" y="104" text-anchor="middle" dominant-baseline="central">Data / AI</text>
+      </g>
+      <g class="node-g c-teal" data-node="go">
+        <circle cx="565" cy="90" r="42" stroke-width="1.5"/>
+        <text class="th" x="565" y="86" text-anchor="middle" dominant-baseline="central">Go</text>
+        <text class="ts" x="565" y="104" text-anchor="middle" dominant-baseline="central">Service</text>
+      </g>
+      <g class="node-g c-purple" data-node="web">
+        <circle cx="340" cy="380" r="42" stroke-width="1.5"/>
+        <text class="th" x="340" y="376" text-anchor="middle" dominant-baseline="central">Web</text>
+        <text class="ts" x="340" y="394" text-anchor="middle" dominant-baseline="central">Browser</text>
+      </g>
+    </g>
+  </svg>
+
+  <div id="poly-panel"></div>
+</div>
+
+<script>
+  const NODES = {
+    rust:   { name: 'Rust',   subtitle: 'Memory-safe core',         color: '#D85A30', cls: 'lang-rust' },
+    python: { name: 'Python', subtitle: 'Data / AI runtime',        color: '#BA7517', cls: 'lang-python' },
+    go:     { name: 'Go',     subtitle: 'Concurrent service runtime', color: '#1D9E75', cls: 'lang-go' },
+    web:    { name: 'Web',    subtitle: 'JS · TS · WASM in browser', color: '#7F77DD', cls: 'lang-web' }
+  };
+  const EDGES = {
+    'rust-python': {
+      from: 'rust', to: 'python', stack: 'PyO3 / Maturin',
+      latency: '~45 ns', ownership: 'GIL-managed', format: 'PyObject · NumPy zero-copy',
+      summary: 'Rust compiles as a native Python extension (.whl). Used to offload tensor math, cryptography, and heavy parsing without abandoning the Pythonic API.',
+      risk: 'The GIL stays held while Rust runs. Wrap heavy CPU work in Python::allow_threads() so other Python threads can make progress.'
+    },
+    'rust-go': {
+      from: 'rust', to: 'go', stack: 'CGo / C-ABI',
+      latency: '~170 ns', ownership: 'Manual free', format: 'C types · pointer + length',
+      summary: 'Go calls into a Rust .so / .a through C-ABI. The highest-latency bridge in the system — goroutines must switch to OS threads for each crossing.',
+      risk: 'Rust-allocated memory is invisible to Go GC. Every CString::into_raw() must return to a Rust-exported free_*() or it leaks. Batch the work — never CGo in a tight loop.'
+    },
+    'rust-web': {
+      from: 'rust', to: 'web', stack: 'wasm-bindgen',
+      latency: '~15 ns', ownership: 'Linear memory', format: 'Pointer offsets · serde-wasm-bindgen',
+      summary: 'Rust runs inside the browser engine at near-native speed. Used for crypto, state management, and rendering math where JS would lag.',
+      risk: 'WASM has no JS objects, only a flat ArrayBuffer. JSON.stringify across the boundary is slow — use serde-wasm-bindgen for direct JS↔struct conversion.'
+    },
+    'python-go': {
+      from: 'python', to: 'go', stack: 'gRPC / Protobuf · IPC',
+      latency: 'µs (IPC)', ownership: 'Isolated heaps', format: 'Protobuf · Unix socket / TCP',
+      summary: 'Two GC runtimes that should not share a process. Talk over Unix socket or TCP with Protobuf — clean process boundaries, no shared memory.',
+      risk: 'Avoid embedding Python in Go (or vice versa) via CGo. The GIL fights goroutine scheduling and both runtimes contend for OS threads.'
+    },
+    'python-web': {
+      from: 'python', to: 'web', stack: 'Pyodide / PyScript',
+      latency: 'WASM-hosted', ownership: 'Browser sandbox', format: 'JS proxy ↔ PyObject',
+      summary: 'CPython itself compiled to WASM. Lets Python run client-side and share the DOM with JS — built for notebooks, in-browser tools, and educational sites.',
+      risk: 'The runtime is ~10MB compressed. First-load cost is real — fine for power-user tools, painful for marketing pages.'
+    },
+    'go-web': {
+      from: 'go', to: 'web', stack: 'gRPC-Web / Go-WASM',
+      latency: 'µs (net) · WASM native', ownership: 'Protobuf or browser sandbox', format: 'Protobuf · syscall/js',
+      summary: 'Two routes: gRPC-Web for browser-to-Go-service calls, or compile Go itself to WASM via syscall/js for client-side logic.',
+      risk: 'Go-to-WASM binaries are large (~2MB minimum) and ship their own scheduler. Prefer TinyGo or Rust if bundle size matters.'
+    }
+  };
+
+  let polySelected = null;
+
+  function polyApplyState() {
+    const sel = polySelected;
+    const relatedNodes = new Set();
+    const relatedEdges = new Set();
+    if (sel) {
+      if (sel.type === 'node') {
+        relatedNodes.add(sel.id);
+        for (const [eid, e] of Object.entries(EDGES)) {
+          if (e.from === sel.id || e.to === sel.id) {
+            relatedEdges.add(eid);
+            relatedNodes.add(e.from);
+            relatedNodes.add(e.to);
+          }
+        }
+      } else {
+        const e = EDGES[sel.id];
+        relatedEdges.add(sel.id);
+        relatedNodes.add(e.from);
+        relatedNodes.add(e.to);
+      }
+    }
+    document.querySelectorAll('#nodes-layer .node-g').forEach(el => {
+      const id = el.getAttribute('data-node');
+      el.classList.toggle('dimmed', !!sel && !relatedNodes.has(id));
+    });
+    document.querySelectorAll('#edges-layer .edge-line').forEach(el => {
+      const id = el.getAttribute('data-edge');
+      const active = !sel || relatedEdges.has(id);
+      el.classList.toggle('dimmed', !active);
+      if (sel && active) {
+        if (sel.type === 'node') {
+          el.setAttribute('stroke', NODES[sel.id].color);
+          el.setAttribute('stroke-width', '2');
+        } else {
+          el.setAttribute('stroke', 'var(--color-text-primary)');
+          el.setAttribute('stroke-width', '2.5');
+        }
+      } else {
+        el.setAttribute('stroke', 'var(--color-border-secondary)');
+        el.setAttribute('stroke-width', '1.5');
+      }
+    });
+    document.querySelectorAll('#edges-layer .edge-label-g').forEach(el => {
+      const id = el.getAttribute('data-edge-label');
+      el.classList.toggle('dimmed', !!sel && !relatedEdges.has(id));
+    });
+  }
+
+  function polyRenderPanel() {
+    const panel = document.getElementById('poly-panel');
+    const sel = polySelected;
+    if (!sel) {
+      panel.innerHTML = `
+        <h3>Polyglot interop map</h3>
+        <p class="lede">Four languages, six bridges. Each edge is a real way to move data or call functions across runtime boundaries.</p>
+        <p class="hint">Tap a language for its bridges, or tap an edge for the full connection details. Tap empty space to reset.</p>`;
+      return;
+    }
+    if (sel.type === 'node') {
+      const n = NODES[sel.id];
+      const conns = Object.entries(EDGES).filter(([, e]) => e.from === sel.id || e.to === sel.id);
+      const items = conns.map(([eid, e]) => {
+        const otherId = e.from === sel.id ? e.to : e.from;
+        const o = NODES[otherId];
+        return `<li onclick="polySelectEdge('${eid}')">
+          <span class="swatch" style="background:${o.color}"></span>
+          <span class="src-dst"><span class="${n.cls}">${n.name}</span><span class="arrow-sep">↔</span><span class="${o.cls}">${o.name}</span></span>
+          <span class="bridge">${e.stack}</span></li>`;
+      }).join('');
+      panel.innerHTML = `
+        <h3><span class="${n.cls}">${n.name}</span><span style="color:var(--color-text-tertiary);font-weight:400;">·</span><span style="color:var(--color-text-secondary);font-weight:400;">${n.subtitle}</span></h3>
+        <p class="lede">${conns.length} bridges out to other runtimes. Tap one for the full contract.</p>
+        <ul class="conn-list">${items}</ul>`;
+      return;
+    }
+    const e = EDGES[sel.id], a = NODES[e.from], b = NODES[e.to];
+    panel.innerHTML = `
+      <h3><span class="${a.cls}">${a.name}</span><span class="arrow-sep">↔</span><span class="${b.cls}">${b.name}</span><span style="color:var(--color-text-tertiary);font-weight:400;margin:0 4px;">·</span>${e.stack}</h3>
+      <p class="lede">${e.summary}</p>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="meta-label">Latency</div><div class="meta-value">${e.latency}</div></div>
+        <div class="meta-item"><div class="meta-label">Ownership</div><div class="meta-value">${e.ownership}</div></div>
+        <div class="meta-item"><div class="meta-label">Wire format</div><div class="meta-value">${e.format}</div></div>
+      </div>
+      <div class="risk-row"><span class="risk-label">Risk ·</span><span>${e.risk}</span></div>`;
+  }
+
+  function polySelectNode(id) { polySelected = { type: 'node', id }; polyApplyState(); polyRenderPanel(); }
+  function polySelectEdge(id) { polySelected = { type: 'edge', id }; polyApplyState(); polyRenderPanel(); }
+  function polyReset() { polySelected = null; polyApplyState(); polyRenderPanel(); }
+
+  document.querySelectorAll('#nodes-layer .node-g').forEach(el => {
+    el.addEventListener('click', ev => { ev.stopPropagation(); polySelectNode(el.getAttribute('data-node')); });
+  });
+  document.querySelectorAll('#edges-layer .edge-hit').forEach(el => {
+    el.addEventListener('click', ev => { ev.stopPropagation(); polySelectEdge(el.getAttribute('data-edge-hit')); });
+  });
+  document.querySelectorAll('#edges-layer .edge-label-g').forEach(el => {
+    el.addEventListener('click', ev => { ev.stopPropagation(); polySelectEdge(el.getAttribute('data-edge-label')); });
+  });
+  polyRenderPanel();
+</script>
