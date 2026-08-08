@@ -9,12 +9,12 @@ VERSION := `git describe --tags --always --dirty`
 list:
     @just --list --unsorted
 
-# Interactive fuzzy-picker over every public recipe.
+# Interactive autocomplete over every public recipe — type to fuzzy-filter.
 [group('meta')]
 menu:
     #!/usr/bin/env nu
     let recipes = (just --summary | str trim | split row ' ')
-    let choice = (^gum choose ...$recipes --header "poly-core") | str trim
+    let choice = ($recipes | str join "\n" | ^gum filter --placeholder "poly-core recipe...") | str trim
     if ($choice | is-not-empty) { just $choice }
 
 [private]

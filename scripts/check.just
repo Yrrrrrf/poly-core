@@ -23,7 +23,7 @@ types:
     cargo check --workspace --all-targets --all-features
 
 [group('check')]
-check: fmt lint types          # composition, not a fourth verb
+check: fmt lint types  # composition, not a fourth verb
 
 # Slower, network-bound — stays out of the default `check`.
 [group('check')]
