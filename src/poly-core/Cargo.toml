@@ -11,9 +11,4 @@ keywords = { workspace = true }
 categories = ["development-tools"]
 
 [dependencies]
-polyglot-core = { path = "../core" }
-# core-macros = { path = "../core-macros", optional = true }  # kept separate until surface codegen lands
-
-[features]
-default = []
-# macros = ["dep:core-macros"]
+polyglot-core = { path = "../core", version = "0.0.1" }

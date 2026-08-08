@@ -11,3 +11,4 @@ keywords = { workspace = true }
 categories = ["development-tools"]
 
 [dependencies]
+poly-core-macros = { path = "../poly-core-macros", version = "0.0.1" }

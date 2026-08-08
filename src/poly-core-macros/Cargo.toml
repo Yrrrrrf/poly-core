@@ -1,8 +1,8 @@
 [package]
-name = "core-macros"
+name = "poly-core-macros"
 version = { workspace = true }
 edition = { workspace = true }
-repository = "https://github.com/Yrrrrrf/poly-core/tree/main/src/core-macros"
+repository = "https://github.com/Yrrrrrf/poly-core/tree/main/src/poly-core-macros"
 description = "Proc-macros for polyglot-core, kept separate from domain logic on purpose."
 authors = { workspace = true }
 license = { workspace = true }

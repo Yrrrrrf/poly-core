@@ -13,7 +13,7 @@ resolver = "3"
 
 members = [
     "src/core",
-    "src/core-macros",
+    "src/poly-core-macros",
     "src/poly-core",
 ]
 

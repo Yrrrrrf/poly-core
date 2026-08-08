@@ -1,4 +1,4 @@
-//! `core-macros` — proc-macros for polyglot-core.
+//! `poly-core-macros` — proc-macros for polyglot-core.
 //!
 //! Kept in their own crate on purpose: proc-macros compile as a separate
 //! crate type and must never carry domain logic — that stays in `core`.
