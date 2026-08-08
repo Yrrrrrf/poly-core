@@ -2,7 +2,7 @@
 
 Proc-macros for the [polyglot-core](https://github.com/Yrrrrrf/poly-core) framework.
 
-[![GitHub: poly-core](https://img.shields.io/badge/GitHub-poly--core-181717?logo=github)](https://github.com/Yrrrrrf/poly-core/tree/main/crates/core-macros)
+[![GitHub: poly-core](https://img.shields.io/badge/GitHub-poly--core-181717?logo=github)](https://github.com/Yrrrrrf/poly-core/tree/main/src/core-macros)
 
 **Note: Kept in its own crate on purpose.** Proc-macros compile as a distinct crate type (`proc-macro = true`) and must never carry domain logic themselves — that stays in [`core`](../core). Splitting them out keeps that boundary impossible to blur by accident.
 
@@ -10,7 +10,7 @@ Proc-macros for the [polyglot-core](https://github.com/Yrrrrrf/poly-core) framew
 
 `core-macros` is responsible for:
 
-* **Codegen helpers**: attribute/derive macros that reduce boilerplate when wiring a `core` function into one of `poly-core`'s per-language faces (`cli`, `wasm`, and later `python`, `go`).
+* **Codegen helpers**: attribute/derive macros that reduce boilerplate when wiring a `core` function into one of `poly-core`'s per-language faces (`cli`, `wasm`, `python`, `go` — none built yet).
 
 ## Current
 

@@ -2,20 +2,21 @@
 
 The per-language faces of the [polyglot-core](https://github.com/Yrrrrrf/poly-core) framework.
 
-[![GitHub: poly-core](https://img.shields.io/badge/GitHub-poly--core-181717?logo=github)](https://github.com/Yrrrrrf/poly-core/tree/main/crates/poly-core)
+[![GitHub: poly-core](https://img.shields.io/badge/GitHub-poly--core-181717?logo=github)](https://github.com/Yrrrrrf/poly-core/tree/main/src/poly-core)
 
 Where [`core`](../core) is the single, language-agnostic engine, `poly-core` is where each language actually gets implemented — one local sub-crate per face, each a thin, mechanical adapter over the same `core` logic.
 
 ## Local sub-crates
 
-| Sub-crate | Language / runtime | Bridge |
-|---|---|---|
-| [`cli`](./cli) | Any language, via subprocess | plain stdin/stdout |
-| [`wasm`](./wasm) | Web / browser | `wasm-bindgen` |
-| `python` _(planned)_ | Python | PyO3 / Maturin |
-| `go` _(planned)_ | Go | UniFFI / CGo |
+| Sub-crate | Language / runtime | Bridge | Status |
+|---|---|---|---|
+| this crate's own `src/lib.rs` | Rust | direct `prelude` | built |
+| `cli` | Any language, via subprocess | plain stdin/stdout | planned |
+| `wasm` | Web / browser | `wasm-bindgen` | planned |
+| `python` | Python | PyO3 / Maturin | planned |
+| `go` | Go | UniFFI / CGo | planned |
 
-This crate's own `src/lib.rs` is the Rust-native face: a `prelude` a Rust consumer depends on directly.
+This crate's own `src/lib.rs` is the Rust-native face: a `prelude` a Rust consumer depends on directly. It's the only face that exists right now — the others land as local sub-crates here as they're built.
 
 ## Usage
 

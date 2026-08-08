@@ -21,12 +21,6 @@
 cargo build
 ```
 
-### Run the CLI floor
-
-```bash
-cargo run --bin polycore
-```
-
 ### Use it as a Rust library
 
 ```rust
@@ -35,9 +29,9 @@ use poly_core::prelude::*;
 
 ## Three pieces
 
-- **[`core`](./crates/core)** — the engine. A simple, language-agnostic core that adapts to whatever code generation a face needs (see [`docs/polyglot-lang-map.html`](./docs/polyglot-lang-map.html) for the interop map this generalizes). No I/O, no FFI, no state.
-- **[`poly-core`](./crates/poly-core)** — the faces. Each language's implementation lives here as a local sub-crate (`cli` for any subprocess-capable language, `wasm` for the browser, `python`/`go` later) — plus its own `lib.rs` as the Rust-native face.
-- **[`core-macros`](./crates/core-macros)** — the macros. Proc-macro codegen helpers, kept in their own crate so they can never smuggle domain logic in with them.
+- **[`core`](./src/core)** — the engine. A simple, language-agnostic core that adapts to whatever code generation a face needs (see [`docs/polyglot-lang-map.html`](./docs/polyglot-lang-map.html) for the interop map this generalizes). No I/O, no FFI, no state.
+- **[`poly-core`](./src/poly-core)** — the faces. Each language's implementation lives here as a local sub-crate — for now just its own `lib.rs` as the Rust-native face; `cli`, `wasm`, `python`, `go` land here as they're built.
+- **[`core-macros`](./src/core-macros)** — the macros. Proc-macro codegen helpers, kept in their own crate so they can never smuggle domain logic in with them.
 
 ## Directory Structure
 
@@ -50,7 +44,7 @@ poly-core/
 │   ├── MANIFEST.md          # the why
 │   ├── CORE_SPEC_V01.md     # the how (full design + phased plan)
 │   └── polyglot-lang-map.html
-└── crates/
+└── src/
     ├── core/                 # the engine — language-agnostic, adapts to any codegen
     │   ├── README.md
     │   ├── Cargo.toml
@@ -64,43 +58,32 @@ poly-core/
     └── poly-core/            # the faces — one local sub-crate per language
         ├── README.md
         ├── Cargo.toml
-        ├── src/
-        │   └── lib.rs        # the Rust-native face (prelude)
-        ├── cli/               # any language, via subprocess
-        │   ├── README.md
-        │   ├── Cargo.toml
-        │   └── src/
-        │       └── main.rs
-        └── wasm/              # the web/browser face
-            ├── README.md
-            ├── Cargo.toml
-            └── src/
-                └── lib.rs
+        └── src/
+            └── lib.rs        # the Rust-native face (prelude), the only face so far
 ```
 
 ## Crates
 
 | Crate | Responsibility | Consumes |
 |---|---|---|
-| [`core`](./crates/core) | The engine — all domain logic, as pure functions over a shared wire contract. | Nothing in this repo. |
-| [`poly-core`](./crates/poly-core) | The Rust-native face (prelude) + the home for every other language's face. | `core` |
-| [`poly-core/cli`](./crates/poly-core/cli) | Expose `core` as a subprocess-invokable binary, for any language. | `core` |
-| [`poly-core/wasm`](./crates/poly-core/wasm) | Expose `core` to the browser via `wasm-bindgen`. | `core` |
-| [`core-macros`](./crates/core-macros) | Proc-macro codegen helpers, kept separate from logic. | Nothing yet — not wired into any face. |
+| [`core`](./src/core) | The engine — all domain logic, as pure functions over a shared wire contract. | Nothing in this repo. |
+| [`poly-core`](./src/poly-core) | The Rust-native face (prelude) + the home for every other language's face. | `core` |
+| [`core-macros`](./src/core-macros) | Proc-macro codegen helpers, kept separate from logic. | Nothing yet — not wired into any face. |
 
 ## Features
 
 ### Current
-- [x] Workspace scaffold: `core`, `core-macros`, `poly-core` (with `cli` and `wasm` as local faces)
+- [x] Workspace scaffold: `core`, `core-macros`, `poly-core`
 - [x] A minimal, deliberately trivial core (proves the delivery machinery first)
+- [x] `poly-core`'s Rust-native prelude face
 - [x] Macros kept in their own crate, unused until a real codegen need appears
 
 ### Planned
 - [ ] Wire contract (shared `serde` request/response types)
-- [ ] `clap`-based CLI adapter (`--json` output)
-- [ ] `wasm-bindgen` adapter consumed by [`glyph`](https://github.com/Yrrrrrf)
-- [ ] Parity vectors (`vectors/`) replayed against every face
+- [ ] `poly-core/cli` — subprocess floor, `clap`-based, any language (`--json` output)
+- [ ] `poly-core/wasm` — browser face via `wasm-bindgen`, consumed by [`glyph`](https://github.com/Yrrrrrf)
 - [ ] `poly-core/python` (PyO3) and `poly-core/go` (UniFFI/CGo) faces
+- [ ] Parity vectors (`vectors/`) replayed against every face
 - [ ] Port glyph's real lex → parse → analyze → encode pipeline into `core`
 
 See [`docs/MANIFEST.md`](./docs/MANIFEST.md) for the why, and [`docs/CORE_SPEC_V01.md`](./docs/CORE_SPEC_V01.md) for the full design and phased plan.
