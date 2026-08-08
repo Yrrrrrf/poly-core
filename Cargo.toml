@@ -1,6 +1,32 @@
-[package]
-name = "core"
-version = "0.1.0"
-edition = "2024"
+# polyglot-core/Cargo.toml (Main workspace manifest)
+[workspace]
+package.version = "0.0.1"
+package.edition = "2024"
+package.authors = ["Fernando Bryan Reza Campos <fer.rezac@outlook.com>"]
+package.license = "MIT"
+package.readme = "README.md"
+package.keywords = ["polyglot", "ffi", "wasm", "core", "cli"]
 
-[dependencies]
+package.repository = "https://github.com/Yrrrrrf/poly-core"
+
+resolver = "3"
+
+members = [
+    "src/core",
+    "src/core-macros",
+    "src/poly-core",
+]
+
+# * COMPILE OPTIMIZATION ------------------------------------------------------------------------
+[profile.dev]
+opt-level = 0  # no optimizations (fastest compile time, slowest runtime)
+
+[profile.dev.package."*"]
+opt-level = 3  # Optimize the dependencies at the highest level
+
+# * Use it only during building to allow maximum optimizations on release builds
+[profile.release]
+opt-level = 3       # Enable full optimizations.
+lto = true          # Enable Link-Time Optimization for a smaller/faster binary.
+codegen-units = 1   # Compile everything in one unit for max optimization (slower compile time).
+strip = true        # Strip debug symbols from the final binary to reduce size.

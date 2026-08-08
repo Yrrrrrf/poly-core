@@ -1,0 +1,13 @@
+[package]
+name = "polyglot-core"
+version = { workspace = true }
+edition = { workspace = true }
+repository = "https://github.com/Yrrrrrf/poly-core/tree/main/src/core"
+description = "Pure domain logic for polyglot-core — no I/O, no FFI, no state. The single source of truth every surface wraps."
+authors = { workspace = true }
+license = { workspace = true }
+readme = "README.md"
+keywords = { workspace = true }
+categories = ["development-tools"]
+
+[dependencies]

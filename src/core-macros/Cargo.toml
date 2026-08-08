@@ -1,0 +1,19 @@
+[package]
+name = "core-macros"
+version = { workspace = true }
+edition = { workspace = true }
+repository = "https://github.com/Yrrrrrf/poly-core/tree/main/src/core-macros"
+description = "Proc-macros for polyglot-core, kept separate from domain logic on purpose."
+authors = { workspace = true }
+license = { workspace = true }
+readme = "README.md"
+keywords = { workspace = true }
+categories = ["development-tools::procedural-macro-helpers"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"
